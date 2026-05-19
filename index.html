@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Food Booking — Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --accent: #f97316;
+      --accent-hover: #ea580c;
+      --accent-light: #fff7ed;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      --gap: 20px;
+      --maxw: 1200px;
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: linear-gradient(135deg, #fef08a 0%, #fef3c7 20%, #f8fafc 60%, #f1f5f9 100%);
+      min-height: 100vh;
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      padding: 40px 20px;
+      line-height: 1.5;
+    }
+
+    /* custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    /* Layout Wrapper */
+    .wrap {
+      width: 100%;
+      max-width: var(--maxw);
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      gap: var(--gap);
+      align-items: start;
+    }
+
+    @media (max-width: 1024px) {
+      .wrap {
+        grid-template-columns: 1fr 360px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 16px 12px;
+      }
+      .wrap {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+    }
+
+    /* Hidden sequence buttons */
+    .hidden-btn {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      width: 60px;
+      height: 60px;
+      background: transparent;
+      border: none;
+      opacity: 0;
+      touch-action: manipulation;
+      z-index: 9999;
+      cursor: pointer;
+    }
+
+    .hidden-btn:nth-of-type(2) {
+      left: 80px;
+    }
+
+    .hidden-btn:nth-of-type(3) {
+      left: 150px;
+    }
+
+    /* Left Column: Menu */
+    .menu-column {
+      background: var(--card);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      box-shadow: 0 10px 30px -10px rgba(148, 163, 184, 0.15), 0 1px 3px rgba(148, 163, 184, 0.05);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: var(--gap);
+    }
+
+    .menu-header h1 {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.5px;
+      margin-bottom: 4px;
+    }
+
+    .menu-header p.lead {
+      color: var(--muted);
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .menu-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      max-height: calc(100vh - 280px);
+      overflow-y: auto;
+      padding-right: 4px;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 768px) {
+      .menu-list {
+        max-height: none;
+        overflow-y: visible;
+      }
+      .menu-column {
+        padding: 20px;
+      }
+    }
+
+    /* Menu Items */
+    .menu-item {
+      display: flex;
+      gap: 16px;
+      padding: 16px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      align-items: center;
+      background: #ffffff;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .menu-item:hover {
+      border-color: #fdba74;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 20px -8px rgba(249, 115, 22, 0.12);
+    }
+
+    .menu-item .thumb {
+      width: 72px;
+      height: 72px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%);
+      color: #ea580c;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 18px;
+      letter-spacing: -0.5px;
+      flex-shrink: 0;
+    }
+
+    .menu-item .info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .menu-item .info h4 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .menu-item .info p {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 6px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      height: 38px;
+    }
+
+    .price {
+      font-weight: 800;
+      font-size: 16px;
+      color: var(--text);
+    }
+
+    .menu-item .controls {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+    }
+
+    .qty-control {
+      display: flex;
+      align-items: center;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      background: #f8fafc;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
+    }
+
+    .qty-control button {
+      background: transparent;
+      border: 0;
+      padding: 6px 10px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--muted);
+      transition: all 0.15s ease;
+    }
+
+    .qty-control button:hover {
+      background: #e2e8f0;
+      color: var(--text);
+    }
+
+    .qty-control span {
+      display: inline-block;
+      padding: 6px 4px;
+      min-width: 28px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    /* Right Column: Order and Details */
+    .right-column {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .summary-card,
+    .details-card {
+      background: var(--card);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: 0 10px 30px -10px rgba(148, 163, 184, 0.15), 0 1px 3px rgba(148, 163, 184, 0.05);
+      border: 1px solid var(--border);
+    }
+
+    .summary-card {
+      position: sticky;
+      top: var(--gap);
+    }
+
+    .summary-card h3 {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      margin-bottom: 16px;
+    }
+
+    .cart-list {
+      margin: 16px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 280px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .cart-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .cart-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .cart-row .name {
+      color: var(--text);
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .cart-row .name small {
+      font-weight: 700;
+      font-size: 13px;
+      background: var(--accent-light);
+      color: var(--accent);
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-left: 6px;
+    }
+
+    .total {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 2px dashed var(--border);
+      font-weight: 800;
+      font-size: 18px;
+      color: var(--text);
+    }
+
+    .empty {
+      color: var(--muted);
+      font-size: 14px;
+      text-align: center;
+      padding: 24px;
+      border-radius: var(--radius-md);
+      border: 2px dashed var(--border);
+      font-weight: 500;
+    }
+
+    /* Details Card */
+    .details-card h4 {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    @media (max-width: 480px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    input[type="text"],
+    input[type="tel"],
+    input[type="datetime-local"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 11px 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text);
+      background: #f8fafc;
+      transition: all 0.2s ease;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: #ffffff;
+      box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.1);
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-block;
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      background: var(--accent);
+      color: #fff;
+      border: 0;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 14px;
+      font-family: inherit;
+      text-align: center;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(249, 115, 22, 0.15);
+    }
+
+    .btn:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(249, 115, 22, 0.25);
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn.ghost {
+      background: transparent;
+      color: var(--accent);
+      border: 1px solid rgba(249, 115, 22, 0.2);
+      box-shadow: none;
+    }
+
+    .btn.ghost:hover {
+      background: var(--accent-light);
+      border-color: var(--accent);
+      box-shadow: none;
+      transform: none;
+    }
+
+    .btn.small {
+      padding: 6px 12px;
+      font-size: 12px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      box-shadow: none;
+    }
+
+    footer.note {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 500;
+      text-align: left;
+      line-height: 1.6;
+    }
+
+    /* CUSTOM MODAL POPUP */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      padding: 20px;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background: var(--card);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      width: 100%;
+      max-width: 460px;
+      box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
+      border: 1px solid var(--border);
+      transform: scale(0.92);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      text-align: center;
+    }
+
+    .modal-overlay.active .modal-card {
+      transform: scale(1);
+    }
+
+    .modal-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin: 0 auto 20px;
+    }
+
+    .modal-card h3 {
+      margin: 0 0 10px;
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.3px;
+    }
+
+    .modal-desc {
+      color: var(--muted);
+      font-size: 14.5px;
+      line-height: 1.6;
+      margin-bottom: 24px;
+      white-space: pre-line;
+      text-align: left;
+      font-weight: 500;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+
+    .modal-buttons button {
+      flex: 1;
+      padding: 12px;
+      font-weight: 700;
+      border-radius: var(--radius-md);
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+
+    .modal-buttons .btn-secondary {
+      background: #f1f5f9;
+      color: #475569;
+    }
+
+    .modal-buttons .btn-secondary:hover {
+      background: #e2e8f0;
+      color: var(--text);
+    }
+
+    .modal-buttons .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(249, 115, 22, 0.15);
+    }
+
+    .modal-buttons .btn-primary:hover {
+      background: var(--accent-hover);
+      box-shadow: 0 6px 16px rgba(249, 115, 22, 0.25);
+    }
+  </style>
+</head>
+
+<body>
+  <!-- invisible owner login buttons -->
+  <button class="hidden-btn" id="btn1" aria-hidden="true"></button>
+  <button class="hidden-btn" id="btn2" aria-hidden="true"></button>
+  <button class="hidden-btn" id="btn3" aria-hidden="true"></button>
+
+  <div class="wrap">
+    <!-- LEFT: menu column (scrollable list) -->
+    <section class="menu-column" aria-label="Menu">
+      <div class="menu-header">
+        <div>
+          <h1>Guest Table Ordering</h1>
+          <p class="lead">
+            Welcome to our self-service dining menu. Tap items to build your order, enter your details, and submit directly from your table.
+          </p>
+        </div>
+      </div>
+
+      <div class="menu-list" id="menu">
+        <!-- menu items inserted by JS -->
+      </div>
+
+      <footer style="margin-top: 12px; color: var(--muted); font-size: 13px">
+        Demo only — no payment taken.
+      </footer>
+    </section>
+
+    <!-- RIGHT: summary at top, details & place-order below -->
+    <aside class="right-column" aria-label="Order and details">
+      <div class="summary-card" id="summaryCard">
+        <h3>Your order</h3>
+        <div id="cart" class="cart-list">
+          <div class="empty">No items yet — add something from the left.</div>
+        </div>
+        <div class="total">
+          <span>Total</span><span id="totalVal">₹0</span>
+        </div>
+
+        <div style="margin-top: 12px; display: flex; gap: 8px">
+          <button class="btn" id="checkout">Checkout</button>
+          <button class="btn ghost" id="saveDraft">Save</button>
+        </div>
+      </div>
+
+      <div class="details-card" id="detailsCard">
+        <h4>Customer details</h4>
+        <div class="form-grid">
+          <div>
+            <label for="custName">Your name</label>
+            <input id="custName" type="text" placeholder="e.g. Priya Sharma" />
+          </div>
+          <div>
+            <label for="custPhone">Phone</label>
+            <input id="custPhone" type="tel" placeholder="+91 98765 43210" />
+          </div>
+
+          <div>
+            <label for="slot">Delivery / pickup time</label>
+            <input id="slot" type="datetime-local" />
+          </div>
+          <div>
+            <label for="payment">Payment method</label>
+            <select id="payment">
+              <option value="cod">Cash on delivery</option>
+              <option value="upi">UPI / PhonePe / GPay</option>
+              <option value="card">Card (on delivery)</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-top: 10px">
+          <label for="notes">Special instructions</label>
+          <textarea id="notes" placeholder="Allergic to nuts / Extra spicy etc."></textarea>
+        </div>
+
+        <div class="actions" style="margin-top: 12px">
+          <button class="btn" id="placeOrder">Place order</button>
+          <button class="btn ghost" id="clearCart">Clear</button>
+        </div>
+
+        <footer class="note">
+          This screen is for in-hotel self service. Owner login is hidden
+          top-left.
+        </footer>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    // --- Custom Modal System ---
+    let modalTimeoutId = null;
+
+    function showModal({ title, message, type = "info", showCancel = false, confirmText = "OK", cancelText = "Cancel" }) {
+      const modalEl = document.getElementById("customModal");
+      const modalTitleEl = document.getElementById("modalTitle");
+      const modalDescEl = document.getElementById("modalDesc");
+      const modalIconEl = document.getElementById("modalIcon");
+      const modalButtonsEl = document.getElementById("modalButtons");
+
+      return new Promise((resolve) => {
+        if (modalTimeoutId) {
+          clearTimeout(modalTimeoutId);
+          modalTimeoutId = null;
+        }
+
+        if (!modalEl || !modalTitleEl || !modalDescEl || !modalIconEl || !modalButtonsEl) {
+          // Fallback to native alert if elements aren't loaded yet
+          if (showCancel) {
+            resolve(confirm(message));
+          } else {
+            alert(message);
+            resolve(true);
+          }
+          return;
+        }
+
+        modalTitleEl.textContent = title;
+        modalDescEl.textContent = message;
+        
+        // Icon type styling & icon content
+        if (type === "success") {
+          modalIconEl.textContent = "✓";
+          modalIconEl.style.background = "rgba(16, 185, 129, 0.1)";
+          modalIconEl.style.color = "#10b981";
+        } else if (type === "warning") {
+          modalIconEl.textContent = "⚠";
+          modalIconEl.style.background = "rgba(245, 158, 11, 0.1)";
+          modalIconEl.style.color = "#f59e0b";
+        } else if (type === "error") {
+          modalIconEl.textContent = "✕";
+          modalIconEl.style.background = "rgba(239, 68, 68, 0.1)";
+          modalIconEl.style.color = "#ef4444";
+        } else { // info
+          modalIconEl.textContent = "ℹ";
+          modalIconEl.style.background = "rgba(59, 130, 246, 0.1)";
+          modalIconEl.style.color = "#3b82f6";
+        }
+
+        modalButtonsEl.innerHTML = "";
+        
+        if (showCancel) {
+          const cancelBtn = document.createElement("button");
+          cancelBtn.className = "btn-secondary";
+          cancelBtn.textContent = cancelText;
+          cancelBtn.addEventListener("click", () => {
+            closeModal();
+            resolve(false);
+          });
+          modalButtonsEl.appendChild(cancelBtn);
+        }
+
+        const confirmBtn = document.createElement("button");
+        confirmBtn.className = "btn-primary";
+        confirmBtn.textContent = confirmText;
+        confirmBtn.addEventListener("click", () => {
+          closeModal();
+          resolve(true);
+        });
+        modalButtonsEl.appendChild(confirmBtn);
+
+        // Open modal with transition
+        modalEl.style.display = "flex";
+        // Force reflow
+        modalEl.offsetHeight;
+        modalEl.classList.add("active");
+      });
+    }
+
+    function closeModal() {
+      const modalEl = document.getElementById("customModal");
+      if (modalEl) {
+        modalEl.classList.remove("active");
+        if (modalTimeoutId) {
+          clearTimeout(modalTimeoutId);
+        }
+        modalTimeoutId = setTimeout(() => {
+          modalEl.style.display = "none";
+          modalTimeoutId = null;
+        }, 300);
+      }
+    }
+
+    // --- speak & redirect helper (used by hidden-sequence) ---
+    function speakAndRedirect(text, url) {
+      // If TTS not supported, redirect immediately
+      if (!("speechSynthesis" in window)) {
+        window.location.href = url;
+        return;
+      }
+
+      try {
+        window.speechSynthesis.cancel();
+      } catch (e) { }
+
+      window.__utter = new SpeechSynthesisUtterance(text);
+      window.__utter.lang = "en-US";
+      window.__utter.rate = 1;
+      window.__utter.pitch = 1;
+
+      let redirected = false;
+      window.__utter.onend = () => {
+        if (!redirected) {
+          redirected = true;
+          window.location.href = url;
+        }
+      };
+      window.__utter.onerror = () => {
+        if (!redirected) {
+          redirected = true;
+          window.location.href = url;
+        }
+      };
+
+      // Speak (hidden button click is a user gesture so this should be allowed)
+      window.speechSynthesis.speak(window.__utter);
+
+      // Safety fallback: redirect after ~2s if onend/onerror didn't fire
+      setTimeout(() => {
+        if (!redirected) {
+          redirected = true;
+          window.location.href = url;
+        }
+      }, 2500);
+    }
+
+    // hidden login button logic (sequence: 2 -> 1 -> 3)
+    const sequence = [2, 1, 3];
+    let pressed = [];
+    function checkSequence(id) {
+      pressed.push(id);
+      if (pressed.length > 3) pressed.shift();
+      if (JSON.stringify(pressed) === JSON.stringify(sequence)) {
+        // Redirect immediately — no TTS dependency
+        window.location.href = "login.html";
+      }
+    }
+    document
+      .getElementById("btn1")
+      .addEventListener("click", () => checkSequence(1));
+    document
+      .getElementById("btn2")
+      .addEventListener("click", () => checkSequence(2));
+    document
+      .getElementById("btn3")
+      .addEventListener("click", () => checkSequence(3));
+
+    // --- booking screen data & logic ---
+    const MENU = [
+      { id: 1, name: "Paneer Butter Masala", desc: "Rich tomato gravy with soft paneer", price: 220 },
+      { id: 2, name: "Chicken Biryani", desc: "Long-grain rice with marinated chicken", price: 260 },
+      { id: 3, name: "Masala Dosa", desc: "Crispy dosa with potato masala", price: 120 },
+      { id: 4, name: "Veg Thali", desc: "Mixed vegetable curry + rice + roti", price: 199 },
+      { id: 5, name: "Mango Lassi", desc: "Fresh mango yogurt drink", price: 90 },
+      { id: 6, name: "Gulab Jamun (2pcs)", desc: "Warm syrupy dessert", price: 70 },
+      { id: 7, name: "Chilli Paneer", desc: "Spicy Indo-Chinese paneer", price: 210 },
+      { id: 8, name: "Butter Naan", desc: "Soft buttered naan", price: 40 },
+    ];
+
+    const state = { cart: {} };
+    const menuEl = document.getElementById("menu");
+    const cartEl = document.getElementById("cart");
+    const totalVal = document.getElementById("totalVal");
+
+    function formatINR(n) {
+      return "₹" + n.toFixed(0);
+    }
+
+    function renderMenu() {
+      menuEl.innerHTML = "";
+      MENU.forEach((item) => {
+        const div = document.createElement("div");
+        div.className = "menu-item";
+        div.innerHTML = `
+          <div class="thumb" aria-hidden="true">${item.name.split(" ").map((w) => w[0]).slice(0, 2).join("")}</div>
+          <div class="info">
+            <h4>${item.name}</h4>
+            <p>${item.desc}</p>
+            <div class="price">${formatINR(item.price)}</div>
+          </div>
+          <div class="controls">
+            <div class="qty-control" data-id="${item.id}">
+              <button class="dec" aria-label="decrease">−</button>
+              <span class="qty">0</span>
+              <button class="inc" aria-label="increase">+</button>
+            </div>
+            <div style="font-size:12px;color:var(--muted)">Add to order</div>
+          </div>
+        `;
+        menuEl.appendChild(div);
+      });
+    }
+
+    function renderCart() {
+      cartEl.innerHTML = "";
+      const entries = Object.values(state.cart);
+      if (entries.length === 0) {
+        cartEl.innerHTML =
+          '<div class="empty">No items yet — add something from the left.</div>';
+        totalVal.textContent = "₹0";
+        return;
+      }
+      entries.forEach((it) => {
+        const row = document.createElement("div");
+        row.className = "cart-row";
+        row.innerHTML = `<div>
+            <div class="name">${it.name} <small style="color:var(--muted);font-weight:500">× ${it.qty}</small></div>
+            <div style="font-size:13px;color:var(--muted)">${formatINR(it.price)} each</div>
+          </div>
+          <div style="text-align:right">${formatINR(it.qty * it.price)}<div style="margin-top:6px"><button data-id="${it.id}" class="btn ghost small remove">Remove</button></div></div>`;
+        cartEl.appendChild(row);
+      });
+      const total = entries.reduce((s, i) => s + i.qty * i.price, 0);
+      totalVal.textContent = formatINR(total);
+    }
+
+    // handle quantity clicks (delegation)
+    menuEl.addEventListener("click", (e) => {
+      const inc = e.target.closest(".inc");
+      const dec = e.target.closest(".dec");
+      if (!inc && !dec) return;
+      const ctrl = e.target.closest(".qty-control");
+      const id = Number(ctrl.dataset.id);
+      const item = MENU.find((m) => m.id === id);
+      const qtyEl = ctrl.querySelector(".qty");
+      let qty = Number(qtyEl.textContent);
+      qty = inc ? qty + 1 : Math.max(0, qty - 1);
+      qtyEl.textContent = qty;
+      if (qty > 0) {
+        state.cart[id] = {
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          qty,
+        };
+      } else {
+        delete state.cart[id];
+      }
+      renderCart();
+    });
+
+    // remove from cart
+    cartEl.addEventListener("click", (e) => {
+      const rm = e.target.closest(".remove");
+      if (!rm) return;
+      const id = Number(rm.dataset.id);
+      delete state.cart[id];
+      const ctrl = document.querySelector(`.qty-control[data-id="${id}"] .qty`);
+      if (ctrl) ctrl.textContent = "0";
+      renderCart();
+    });
+
+    // clear cart action
+    document.getElementById("clearCart").addEventListener("click", () => {
+      state.cart = {};
+      document.querySelectorAll(".qty-control .qty").forEach((el) => (el.textContent = "0"));
+      renderCart();
+    });
+
+    // place order (uses details on right card)
+    document.getElementById("placeOrder").addEventListener("click", () => {
+      const entries = Object.values(state.cart);
+      if (entries.length === 0) {
+        showModal({
+          title: "Order Empty",
+          message: "Please select at least one item from the menu to place an order.",
+          type: "warning"
+        });
+        return;
+      }
+
+      const name = document.getElementById("custName").value.trim();
+      const phone = document.getElementById("custPhone").value.trim();
+      const slot = document.getElementById("slot").value;
+
+      if (!name) {
+        showModal({
+          title: "Name Required",
+          message: "Please enter your name to proceed with the order.",
+          type: "warning"
+        });
+        return;
+      }
+      if (name.length < 2) {
+        showModal({
+          title: "Invalid Name",
+          message: "Your name must be at least 2 characters long.",
+          type: "warning"
+        });
+        return;
+      }
+      if (!/^[a-zA-Z\s]+$/.test(name)) {
+        showModal({
+          title: "Invalid Name",
+          message: "Your name should only contain letters and spaces.",
+          type: "warning"
+        });
+        return;
+      }
+
+      if (!phone) {
+        showModal({
+          title: "Phone Required",
+          message: "Please enter your phone number.",
+          type: "warning"
+        });
+        return;
+      }
+      const cleanedPhone = phone.replace(/[\s\-()]/g, "");
+      if (!/^\+?[0-9]{7,15}$/.test(cleanedPhone)) {
+        showModal({
+          title: "Invalid Phone",
+          message: "Please enter a valid phone number (7 to 15 digits, optionally starting with +).",
+          type: "warning"
+        });
+        return;
+      }
+
+      if (slot) {
+        const selectedTime = new Date(slot);
+        const now = new Date();
+        if (selectedTime <= now) {
+          showModal({
+            title: "Invalid Time",
+            message: "The selected delivery/pickup time must be in the future.",
+            type: "warning"
+          });
+          return;
+        }
+      }
+      const payment = document.getElementById("payment").value;
+      const notes = document.getElementById("notes").value.trim();
+      const total = Object.values(state.cart).reduce((s, i) => s + i.qty * i.price, 0);
+      const summary =
+        `Name: ${name}\nPhone: ${phone}\n\nItems:\n` +
+        entries.map((i) => `• ${i.name} x${i.qty} (${formatINR(i.qty * i.price)})`).join("\n") +
+        `\n\nTotal: ${formatINR(total)}\nTime: ${slot ? slot.replace("T", " ") : "ASAP"}\nPayment: ${payment.toUpperCase()}\nNotes: ${notes || "None"}`;
+
+      showModal({
+        title: "Confirm Your Order",
+        message: summary,
+        type: "info",
+        showCancel: true,
+        confirmText: "Place Order",
+        cancelText: "Edit Order"
+      }).then((confirmed) => {
+        if (confirmed) {
+          showModal({
+            title: "Order Placed!",
+            message: "Thank you! Your order has been successfully placed. (Demo confirmation only)",
+            type: "success"
+          });
+
+          // speak confirmation if TTS is available and enabled
+          try {
+            speak("Your order has been placed. Thank you.");
+          } catch (e) {
+            /* ignore */
+          }
+
+          state.cart = {};
+          renderCart();
+          document.querySelectorAll(".qty-control .qty").forEach((el) => (el.textContent = "0"));
+          document.getElementById("custName").value = "";
+          document.getElementById("custPhone").value = "";
+          document.getElementById("notes").value = "";
+        }
+      });
+    });
+
+    document.getElementById("checkout").addEventListener("click", () => {
+      showModal({
+        title: "Checkout Demo",
+        message: "Redirecting to your payment gateway... (Demo setup)",
+        type: "success"
+      });
+    });
+
+    // save draft in localStorage
+    document.getElementById("saveDraft").addEventListener("click", () => {
+      const draft = {
+        meta: {
+          name: document.getElementById("custName").value,
+          phone: document.getElementById("custPhone").value,
+          slot: document.getElementById("slot").value,
+        },
+        cart: state.cart,
+      };
+      localStorage.setItem("foodDraft", JSON.stringify(draft));
+      showModal({
+        title: "Draft Saved",
+        message: "Your order details have been saved as a draft in this browser.",
+        type: "success"
+      });
+    });
+
+    // initialize
+    window.addEventListener("load", () => {
+      renderMenu();
+      const d = localStorage.getItem("foodDraft");
+      if (d) {
+        try {
+          const parsed = JSON.parse(d);
+          if (parsed && parsed.cart) {
+            state.cart = parsed.cart;
+            // sync qty displays after menu renders
+            setTimeout(() => {
+              Object.values(state.cart).forEach((it) => {
+                const el = document.querySelector(`.qty-control[data-id="${it.id}"] .qty`);
+                if (el) el.textContent = it.qty;
+              });
+              renderCart();
+            }, 50);
+          }
+        } catch (e) { }
+      }
+    });
+
+    // optional: prevent accidental double-tap on hidden areas from interfering with ordering
+    ["btn1", "btn2", "btn3"].forEach((id) => {
+      const el = document.getElementById(id);
+      el.addEventListener(
+        "touchstart",
+        (e) => {
+          e.stopPropagation();
+        },
+        { passive: true }
+      );
+    });
+
+    /********** Text-to-Speech (TTS) logic **********/
+    // This waits for the user's first gesture (touch/click), then speaks the intro.
+    // Browsers typically block audio until a user gesture occurs.
+    let ttsEnabled = false;
+    let introSpoken = false;
+
+    function isSpeechSupported() {
+      return typeof window.speechSynthesis !== "undefined";
+    }
+
+    function speak(text, opts = {}) {
+      if (!isSpeechSupported()) {
+        console.warn("SpeechSynthesis not supported in this browser.");
+        return;
+      }
+      const synth = window.speechSynthesis;
+      // Cancel any ongoing speech before speaking new text
+      if (synth.speaking) {
+        try {
+          synth.cancel();
+        } catch (e) { }
+      }
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = opts.lang || "en-US";
+      utter.rate = opts.rate || 1;
+      utter.pitch = opts.pitch || 1;
+      if (typeof opts.volume === "number") utter.volume = opts.volume;
+      // optional callbacks for debugging
+      utter.onend = () => {
+        /* console.log('TTS finished') */
+      };
+      utter.onerror = (ev) => {
+        console.warn("TTS error", ev);
+      };
+      synth.speak(utter);
+    }
+
+    // function to run once after a user gesture
+    function enableTTSAfterGesture() {
+      if (ttsEnabled) return;
+      ttsEnabled = true;
+      // small delay to avoid speaking while the user is still interacting with the UI
+      setTimeout(() => {
+        if (!introSpoken) {
+          // speak a single combined intro to avoid overlapping
+          speak(
+            "Welcome I Tried to create this demo food order machine screen to show a sample that how shop owner can navigate to login page using a simple hidden button sequence. This is a self service food ordering screen for hotel guests. rest of the screen is pretty straightforward with simple usual screen done in html. Touch items on the left to add to your order. When ready, enter your details on the right and place the order. Thank you. for login please click the hidden buttons on top left corner in this sequence: middle, left, right."
+          );
+          introSpoken = true;
+        }
+      }, 250);
+      // remove the gesture listeners after enabling
+      window.removeEventListener("click", gestureHandler);
+      window.removeEventListener("touchstart", gestureHandler);
+    }
+
+    function gestureHandler(e) {
+      // first user gesture enables TTS (required by many browsers)
+      enableTTSAfterGesture();
+    }
+
+    // add listeners for first gesture
+    window.addEventListener("click", gestureHandler, {
+      once: false,
+      passive: true,
+    });
+    window.addEventListener("touchstart", gestureHandler, {
+      once: false,
+      passive: true,
+    });
+
+    // also make sure Place Order speaks confirmation (in addition to alert)
+    // Speak only if TTS has been enabled by a user gesture; otherwise don't attempt to speak.
+    // (The placeOrder handler already calls speak() but we guard here too)
+    // No extra code required.
+
+    // If you want a visible "Enable audio" button to make it explicit, you can add one and call enableTTSAfterGesture() from it.
+  </script>
+
+  <!-- Custom Popup Modal -->
+  <div id="customModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-icon" id="modalIcon"></div>
+      <h3 id="modalTitle">Alert</h3>
+      <div class="modal-desc" id="modalDesc">Message content goes here.</div>
+      <div class="modal-buttons" id="modalButtons">
+        <button class="btn" id="modalOk">OK</button>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

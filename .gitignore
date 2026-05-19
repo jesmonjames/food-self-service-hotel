@@ -1,0 +1,13 @@
+# Browser & IDE files
+.vscode/
+.idea/
+.gemini/
+*.log
+Thumbs.db
+Desktop.ini
+node_modules/
+.tempmediaStorage/
+*.webp
+*.png
+*.txt
+*.md

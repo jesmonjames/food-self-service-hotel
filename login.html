@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Owner Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: rgba(30, 41, 59, 0.7);
+      --accent: #f97316;
+      --accent-hover: #ea580c;
+      --muted: #94a3b8;
+      --border: rgba(255, 255, 255, 0.08);
+      --radius: 16px;
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top left, #1e1b4b 0%, #0f172a 40%, #020617 100%);
+      color: #fff;
+      padding: 20px;
+    }
+    .card {
+      width: 100%;
+      max-width: 400px;
+      padding: 36px;
+      border-radius: var(--radius);
+      background: var(--card);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--border);
+      transition: all 0.3s ease;
+    }
+    .card:hover {
+      border-color: rgba(249, 115, 22, 0.2);
+      box-shadow: 0 25px 50px -12px rgba(249, 115, 22, 0.05);
+    }
+    h2 {
+      margin: 0 0 8px;
+      font-weight: 800;
+      font-size: 24px;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #fff 60%, #fdba74 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    p {
+      margin: 0 0 24px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+    label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      display: block;
+      margin-bottom: 6px;
+    }
+    input[type=text], input[type=password] {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(15, 23, 42, 0.4);
+      color: #fff;
+      font-size: 14.5px;
+      font-family: inherit;
+      margin-bottom: 16px;
+      transition: all 0.2s ease;
+    }
+    input:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: rgba(15, 23, 42, 0.6);
+      box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.15);
+    }
+    .row {
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+    }
+    .btn {
+      flex: 1;
+      padding: 12px;
+      border-radius: 10px;
+      border: 0;
+      background: var(--accent);
+      color: #fff;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 14.5px;
+      font-family: inherit;
+      text-align: center;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2);
+    }
+    .btn:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(249, 115, 22, 0.35);
+    }
+    .btn:active {
+      transform: translateY(1px);
+    }
+    .btn.btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      box-shadow: none;
+    }
+    .btn.btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.03);
+      border-color: var(--muted);
+      color: #fff;
+      box-shadow: none;
+      transform: none;
+    }
+    .error {
+      color: #fca5a5;
+      font-size: 13.5px;
+      margin-top: 12px;
+      font-weight: 500;
+      background: rgba(239, 68, 68, 0.1);
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Owner login</h2>
+    <p>Enter credentials to access admin functions.</p>
+
+    <label for="user">Username</label>
+    <input id="user" type="text" autocomplete="username" placeholder="owner">
+    <label for="pass">Password</label>
+    <input id="pass" type="password" autocomplete="current-password" placeholder="••••••">
+
+    <div class="row">
+      <button id="cancel" class="btn btn-secondary">Cancel</button>
+      <button id="login" class="btn">Login</button>
+    </div>
+
+    <div id="err" class="error" style="display:none"></div>
+  </div>
+
+  <script>
+    // demo credentials (change/remove in production)
+    const VALID = {user: 'owner', pass: 'letmein'};
+    const userEl = document.getElementById('user');
+    const passEl = document.getElementById('pass');
+    const errEl = document.getElementById('err');
+
+    document.getElementById('login').addEventListener('click', ()=>{
+      const u = userEl.value.trim();
+      const p = passEl.value;
+      if(u === VALID.user && p === VALID.pass){
+        // successful login -> redirect back to booking screen (adjust filename if needed)
+        window.location.href = 'index.html';
+      } else {
+        errEl.style.display = 'block';
+        errEl.textContent = 'Invalid credentials';
+      }
+    });
+
+    document.getElementById('cancel').addEventListener('click', ()=>{
+      // go back to booking screen without logging in
+      window.location.href = 'index.html';
+    });
+
+    // convenience: press Enter to submit
+    [userEl, passEl].forEach(el=> el.addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('login').click(); }));
+  </script>
+</body>
+</html>
